@@ -34,13 +34,11 @@ const ReviewSection = () => {
     comment: "",
   });
 
-  // Fetch reviews from backend API on mount
   useEffect(() => {
-    fetch("http://localhost:5000/reviews")
+    fetch("https://review-backend-8uld.onrender.com/reviews")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
-          // Directly map backend fields to frontend state
           const parsedReviews = data.map((r) => ({
             id: r.id.toString(),
             name: r.name,
@@ -59,65 +57,65 @@ const ReviewSection = () => {
 
   // Submit new review to backend API
   const handleSubmitReview = async () => {
-  const { name, role, rating, comment } = newReview;
+    const { name, role, rating, comment } = newReview;
 
-  if (!name.trim() || !role.trim() || !comment.trim()) {
-    toast({
-      title: "Error",
-      description: "Please fill in all fields.",
-      variant: "destructive",
-    });
-    return;
-  }
-
-  const payload = { name, role, rating, comment };
-
-  console.log("Submitting review:", payload);
-
-  try {
-    const response = await fetch("http://localhost:5000/reviews", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Failed response:", errorText);
-      throw new Error(`Server error: ${response.status}`);
+    if (!name.trim() || !role.trim() || !comment.trim()) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields.",
+        variant: "destructive",
+      });
+      return;
     }
 
-    const savedReview = await response.json();
+    const payload = { name, role, rating, comment };
 
-    setReviews((prev) => [
-      {
-        id: savedReview.id.toString(),
-        name: savedReview.name,
-        role: savedReview.role,
-        rating: savedReview.rating,
-        comment: savedReview.comment,
-        date: savedReview.timestamp.split("T")[0],
-      },
-      ...prev,
-    ]);
+    try {
+      const response = await fetch(
+        "https://review-backend-8uld.onrender.com/reviews",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
 
-    toast({
-      title: "Success",
-      description: "Thank you for your review!",
-    });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Failed response:", errorText);
+        throw new Error(`Server error: ${response.status}`);
+      }
 
-    setNewReview({ name: "", role: "", rating: 5, comment: "" });
-    setIsDialogOpen(false);
-  } catch (error) {
-    console.error("Submit review error:", error);
-    toast({
-      title: "Error",
-      description: "Failed to submit review. Please try again later.",
-      variant: "destructive",
-    });
-  }
-};
+      const savedReview = await response.json();
 
+      setReviews((prev) => [
+        {
+          id: savedReview.id.toString(),
+          name: savedReview.name,
+          role: savedReview.role,
+          rating: savedReview.rating,
+          comment: savedReview.comment,
+          date: savedReview.timestamp.split("T")[0],
+        },
+        ...prev,
+      ]);
+
+      toast({
+        title: "Success",
+        description: "Thank you for your review!",
+      });
+
+      setNewReview({ name: "", role: "", rating: 5, comment: "" });
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error("Submit review error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to submit review. Please try again later.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const renderStars = (
     rating: number,
@@ -275,11 +273,11 @@ const ReviewSection = () => {
                             </div>
                             <div>{renderStars(review.rating)}</div>
                           </div>
-                          <p className="text-gray-400 text-sm font-exo whitespace-pre-wrap">
+                          <p className="text-gray-300 text-sm font-exo">
                             {review.comment}
                           </p>
                         </div>
-                        <p className="text-xs text-blue-500 font-exo mt-4">
+                        <p className="mt-4 text-xs text-gray-500 font-mono">
                           {review.date}
                         </p>
                       </CardContent>
